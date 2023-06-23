@@ -1,0 +1,103 @@
+---
+title: "Week 4. Classical decomposition"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+ We will be looking at the `AirPassengers` dataset 
+ which comes with the `forecast` package. This means 
+ that you don't have to read it from an external csv file. 
+ The data has the monthly totals (in thousands) of 
+ international airline passenger bookings, 1949 to 1960. 
+ Let's go ahead and see what is in this time series dataset: 
+ 
+```{r}  
+#load the forecast R package
+
+install.packages("forecast")
+library(forecast)
+
+```
+
+Let's have a look at the data set
+
+```{r}
+data("AirPassengers")
+
+class(AirPassengers)
+
+start(AirPassengers)
+end(AirPassengers)
+frequency(AirPassengers)
+
+autoplot(AirPassengers, ylab="Passengers")
+
+#create a training and validation sets. validation = last year observations
+
+train.ts=window(AirPassengers, end=c(1959,12), frequency=12)
+valid.ts=window(AirPassengers, start=c(1960,1))
+
+model=tslm(train.ts~trend+season)
+
+#plot observed data vs fitted
+
+autoplot(train.ts)+
+  autolayer(model$fitted.values)
+
+accuracy(train.ts, model$fitted.values)
+
+#let's find predicted travel for 1960
+
+pred=forecast(model, h=12)
+
+#find the prediction error
+accuracy(valid.ts, pred$mean)
+
+autoplot(pred)+
+  autolayer(valid.ts)+
+  autolayer
+
+```
+
+Convert data from monthly to yearly using \verb{aggregate()} function. Check whether there is seasonality present.
+
+```{r}
+
+```
+
+
+### Time series components
+
+How to estimate the components in practice? Start with linear trend. Check whether it is a good fit.Analyze the residuals. Check the assumptions of the linear model to decide whether further decomposition is needed.
+
+```{r}
+
+```
+
+
+
+Next, try quadratic trend. Fit the model, add the quadratic trend line, evaluate the fit. Analyze the residuals.
+
+```{r}
+
+```
+
+Estimate the seasonal component. Add the fitted model,evaluate the fit. Analyze the residuals.
+
+```{r}
+
+```
+
+
+
+What about multiplicative model? How should we modify the previous analysis to get it?
+
+```{r}
+
+```
+

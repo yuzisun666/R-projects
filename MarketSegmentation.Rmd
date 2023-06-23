@@ -1,0 +1,156 @@
+---
+title: "Market segmentation case"
+author: "GSBA 522"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Chow Hound: Food for Thought
+
+## Background and Business Model
+
+About two years ago, Harry and Joan Benjamin founded Chow Hound, an online restaurant delivery service in Los Angeles.  Chow Hound followed the now well-worn business model of competitors like GrubHub, Seemless, Foodler and DoorDash.  Specifically, local Los Angeles restaurants partnered with Chow Hound and provided the website with their menu and pricing.  Customers could then visit Chow Hound’s website, search the available menus, and place an order from one of the partner restaurants.  Chow Hound would send a driver to pick up the food from the restaurant to deliver to the customer.  Chow Hound handled all the financial transactions, accepting payment from the customer via credit-card on their website and transferring a payment to the appropriate restaurant.  For their services, Chow Hound retained a small percentage commission of every order.  
+
+On the surface, the business model seems like a “win-win.”  Customers benefit from being able to order delivery from restaurants they would have otherwise had to visit in person.  Restaurants benefit from the increased visibility on Chow Hounds website, while saving on the costs of maintaining their own, in-house delivery services.  Finally, Chow Hound leverages economies of scale to run their driver-delivery fleet as efficiently as possible, while collecting revenue directly from restaurants.  
+
+The simplicity of the model was one of the ideas that inspired Harry and Joan to found the company, and there was ample evidence from competitors like GrubHub that, run well, it could be profitable.  Joan had worked extensively in the restaurant industry, and, when they founded the company, leveraged her personal and professional contacts to build Chow Hound’s small, but loyal, set of partner restaurants.  
+
+## Challenges in the Competitive Landscape
+
+Unfortunately, even after its first two years, Chow Hound was struggling. The online delivery market was nearly saturated, and it was hard for Chow Hound to distinguish from its competitors.  At the end of the day, Chow Hound just wasn’t generating enough transactions to meet the costs of paying its drivers and software developers.  Harry and Joan went around in circles trying to identify the problem:
+
+Harry argued, “We just need more partner restaurants.  Customers are going to use the website with the most partner restaurants.  We should just go door-to-door and build as many partnerships as we can.”
+
+Joan, who had actually done most of the work building their existing partnership base, countered, “Building partnerships is difficult and takes time.  We need to focus on building partnerships with the right restaurants, the ones that are going to be popular with our customers.  I just don’t know which ones that might be.”
+
+“Anyway,” Joan continued, “I think the bigger problem is our pricing structure.  We let the restaurants set whatever prices they think.  I was looking at a couple of them, and it looks like they inflate their online delivery prices over their normal, in-store prices to cover the commission we charge.  Customers aren’t dumb.  They’d rather just drive to the restaurant and do take-away rather than pay the higher prices.”
+
+Harry was unconvinced. “I don’t think are customers are that price-sensitive.  I bet most of our customers are college students ordering delivery because they don’t have cars, or need to stay in the library studying.”  
+
+“But college students don’t have any money!  So shouldn’t we run a marketing campaign to target other customers that might pay more and order more food?” retorted Joan.  
+
+That Harry and Joan were twins became painfully obvious as these conversations heated up.  They’d often continue for hours.  The one thing that they both seemed to agree on, however, was that they didn’t understand their customers.  What kinds of people used Chow Hound?  What kinds of food did they tend order, and how much did they pay?  They needed to figure out what it was their customers actually wanted.  
+
+## Clustering and Market Segmentation
+
+After this small epiphany, Harry suggested forming and running a focus group. They’d get a bunch of their customers together in a room, feed them dinner, talk to them, and get to know who they were and what they wanted.  Unfortunately, as Joan pointed out, focus groups were expensive, especially since their customer base was dispersed throughout LA.  
+
+Instead, Joan first suggested running some cluster analysis on the transaction history they had on their website.  Namely, every customer that used the website had to first set up an account.  Whey they created the account, they specified their birthday and some other personal information.  Chow Hound stored this information as well as the orders that they made in the past few months.  She scraped the past two months of order history for 420 random customers to pull together a small dataset with the following variables:
+
+•	Age – Age of customer
+
+•	Join Date – The date which the customer joined Chow Hound
+
+•	Spending – Average total spending per week on the site per week ($)
+
+•	NumOrders – The average number of orders placed per week 
+
+•	Indian – Average spending per week on the site at Indian Restaurants ($)
+
+•	Chinese – Average spending per week on the site at Chinese Restaurants ($)
+
+•	Thai – Average spending per week on the site at Thai Restaurants ($)
+
+•	Italian – Average spending per week on the site at Italian Restaurants ($)
+
+•	Other – Average spending per week on the site at other types of restaurants ($)
+
+Her hope was that this data could be used to describe the different types of customers at Chow Hound, and, ideally, provide some useful insight on her and Harry’s questions about pricing, marketing and expansion.  
+
+### Task
+
+@. Download `orders.csv` file and upload it in R.
+```{r}
+data<-read.csv("orders.csv")
+head(data,2)
+
+names(data)
+names(data)<-c("Age", "Spending","NumOrders", "Indian","Chinese", "Thai","Italian", "Other", "Joined")
+
+attach(data)
+```
+
+@. Perform exploratory analysis using data summaries and visualization techniques. Write a short paragraph of your preliminary findings.
+
+```{r}
+hist(Spending)
+hist(NumOrders)
+
+hist(Spending/NumOrders)
+
+plot(Spending, NumOrders)
+hist(Age)
+
+plot(Age, Spending)
+```
+
+As we can see from the scatter plot, there are two major clusters with regards to spending and age.
+
+
+@. Perform hierarchical clustering analysis.
+Install and use library `robustHD`. Use function `robstandardize` to standardize the data using robust measures of center and spread. Then, find the distance matrix. Use `hclust()` function with Ward's linkage. Plot a dendogram to help you select the number of clusters.
+```{r}
+
+library(robustHD)
+
+data.s<-robStandardize(data)
+dist<-dist(data.s)
+
+?hclust
+hc.out<-hclust(dist, method = "ward.D")
+
+plot(hc.out)
+
+res.h<-cutree(hc.out,8) #using 8 cluster solution
+
+plot(Age, Spending, col=res.h)
+data<-cbind(data, res.h)
+dim(data)
+names(data)[10]="Clusters_H8"
+
+table(data$Clusters_H8)
+```
+
+@. Perform k-means clustering analysis. 
+Plot the total within SS for different number of clusters, e.g. from 1 to 15. Compare the number of clusters suggested by this plot to the hierarchical clustering results. Comment.
+```{r}
+tot.within<-rep(NA,20)
+
+for(i in 1:20){
+  res.k<-kmeans(data.s, i, nstart = 20)
+  tot.within[i]<-res.k$tot.withinss
+}
+plot(tot.within, type="o")
+
+res.k<-kmeans(data.s,8,nstart = 20)
+res.k$tot.withinss
+
+res.k$centers
+
+
+```
+
+@. Interpret your results. Use`table()` function to compare results of two methods. 
+```{r}
+data<-cbind(data, res.k$cluster)
+names(data)[11]="Cluster_k8"
+table(data$Cluster_k8)
+table(data$Clusters_H8)
+```
+
+@. Use k-means results and interpret the cluster centroid. Describe the typical customer in each cluster and propose ways the ChowHound owners can use this information to advance their company. 
+```{r}
+res.k$centers
+```
+Cluster 5 is outlier group, below the average age, spend more than average, place many orders per week, prefer Chinese.
+
+The owners can use this information to bundle Chinese and Thai food together with discount to keep the customer loyal, because the customers in this group prefer chinese food and thai food. 
+

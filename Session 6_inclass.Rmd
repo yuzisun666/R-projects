@@ -1,0 +1,85 @@
+---
+title: "Week 4. Classical decomposition"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Creating a time series object in R
+
+```{r}
+tmp<- c(1:100)+rnorm(100, mean=0, sd=5)
+
+plot.ts(tmp)
+
+class(tmp)
+
+tmp.ts<-ts(tmp, start=c(2022, 1), frequency = 12)
+
+class(tmp.ts)
+plot(tmp.ts)
+
+```
+
+
+ We will be looking at the `AirPassengers` dataset 
+ which comes with the `forecast` package. This means 
+ that you don't have to read it from an external csv file. 
+ The data has the monthly totals (in thousands) of 
+ international airline passenger bookings, 1949 to 1960. 
+ Let's go ahead and see what is in this time series dataset: 
+ 
+```{r}  
+#load the forecast R package
+install.packages("forecast")
+library(forecast)
+
+```
+
+Let's have a look at the data set
+
+```{r}
+
+```
+
+Convert data from monthly to yearly using \verb{aggregate()} function. Check whether there is seasonality present.
+
+```{r}
+
+```
+
+
+### Time series components
+
+How to estimate the components in practice? Start with linear trend. Check whether it is a good fit.Analyze the residuals. Check the assumptions of the linear model to decide whether further decomposition is needed.
+
+```{r}
+
+```
+
+
+
+Next, try quadratic trend. Fit the model, add the quadratic trend line, evaluate the fit. Analyze the residuals.
+
+```{r}
+
+```
+
+Estimate the seasonal component. Add the fitted model,evaluate the fit. Analyze the residuals.
+
+```{r}
+
+```
+
+
+
+What about multiplicative model? How should we modify the previous analysis to get it?
+
+```{r}
+
+```
+

@@ -1,0 +1,49 @@
+---
+title: "AB testing"
+author: "Y.Sun"
+date: "2022-09-19"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+To run an AB test we need to set up hypothesis first. 
+
+\vspace{2mm}
+
+Null: B is not better than A. Decision: do nothing.
+
+Alternative: B is better than A, some practical action will follow.
+
+
+Choose the significance level $\alpha$. Usually it is 1, 5, or 10 percent. It is the probability of type 1 error, i.e. chance that we reject the null, when in reality it is true. Chances that we have switched to version B unnecessarily.
+
+Decision rule: if $p-value \leq \alpha$, reject the null, conclude the alternative. Otherwise, we fail to reject the null, and we do nothing. 
+
+##Barbie vs. Bratz
+
+Null: The 7-year-olds DO NOT identify more strongly with the Duff Barbie in Stuff than the Bratz.
+
+Alternative: The 7-year-olds identify more strongly with the Duff Barbie in Stuff than the Bratz. Average score for Barbie > average score for Bratz.
+
+```{r}
+data=read.table("BarbievsBratz.txt", header=TRUE)
+head(data,2)
+
+t.test(data$DuffBarbie, data$BratzDoll, 
+       alternative = "greater")
+
+```
+
+Since p-value is greater than 5 percent, fail to reject the null. Conclude that Barbie doll is not better than Bratz.
+
+
+
+
+
+
+

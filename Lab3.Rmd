@@ -1,0 +1,96 @@
+---
+title: "Lab 3. Forecasting Shampoo Sales"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Shampoo sales case
+
+The file ShampooSales.xls contains
+data on the monthly sales of a certain shampoo over a 3-year
+period. (source: Hyndman, R. J. Time Series Data Library,
+http://data.is/TSDLdemo; accessed on July 13, 2015.)
+
+(@) Download the data and convert it to a ts object called _data.ts_.
+```{r}
+install.packages("readxl")
+library(readxl)
+
+data=read_excel("ShampooSales.xls")
+head(data)
+
+data.ts=ts(data$`Shampoo Sales`, start = c(1995,1), frequency = 12)
+
+```
+
+(@) Create a well-formatted time plot of the data. Use _library(forecast)_ and _autoplot()_ function.
+
+```{r}
+
+library(forecast)
+autoplot(data.ts)
+
+```
+
+
+(@) Which of the four components (level, trend, seasonality,
+noise) seem to be present in this series?
+
+```{r}
+
+```
+
+
+(@) Do you expect to see seasonality in sales of shampoo?
+Why?
+```{r}
+
+```
+
+(@) Use _window()_ function with options *start=c(start year, start month)* and *end= c(end year, end month)* to partition data into training (call it _train.ts_) and validation series (call it _valid.ts_). Let the training set consist of the first 2 years of data and validation set be the last year of the time series data. Report the script you used on BB.
+```{r}
+
+start(data.ts)
+end(data.ts)
+
+train.ts = window(data.ts, end=c(1996,12), frequency = 12)
+valid.ts = window(data.ts, start = c(1997,1))
+
+```
+
+
+(@) Use the _tslm()_ function and fit the model to the training ( _train.ts_ ) data. Include the components (trend, seasonal that you've identified earlier). Create the plot of observed values and the fitted values using _autoplot()+autolayer()_ functions.
+Does it look like a goot fit (based on the visual analysis)?
+```{r}
+model = tslm(train.ts~trend + season)
+autoplot(train.ts)+
+  autolayer(model$fitted.values)
+
+```
+
+(@) Use function _accuracy(train.ts, ModelName$fitted.values)_ function and report the RMSE on the training set.
+```{r}
+accuracy(train.ts, model$fitted.values)
+```
+
+(@) Next, forecast shampoo sales 12 months ahead using _forecast()_ function. Report the forecasted sales on December 1997.
+
+```{r}
+pred=forecast(model, h=12)
+pred
+
+```
+
+(@) Use the _accuracy()_ function to report the prediction RMSE (RMSE on the testing set).
+```{r}
+accuracy(valid.ts, pred$mean)
+```
+
+
+(@) Did the testing RMSE increase from the training RMSE?
+
